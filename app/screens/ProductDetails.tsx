@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TextInput, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../App';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -104,92 +104,94 @@ function ProductDetails({ route, navigation }: Props): React.JSX.Element {
 
   return (
     <SafeAreaView style={styles.page}>
-      {product && (
-        <View style={styles.container}>
-          <Text style={styles.header}>{product.nombre}</Text>
-          <View style={styles.row}>
-            <Text style={[styles.text, styles.col]}>Existencias:</Text>
-            <Text style={[styles.text, styles.colAuto]}>
-              <Text
-                style={
-                  product.currentStock < product.minStock
-                    ? styles.stockError
-                    : null
-                }
-              >
-                {product.currentStock}
-              </Text>{' '}
-              / {product.maxStock}
-            </Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {product && (
+          <View style={styles.container}>
+            <Text style={styles.header}>{product.nombre}</Text>
+            <View style={styles.row}>
+              <Text style={[styles.text, styles.col]}>Existencias:</Text>
+              <Text style={[styles.text, styles.colAuto]}>
+                <Text
+                  style={
+                    product.currentStock < product.minStock
+                      ? styles.stockError
+                      : null
+                  }
+                >
+                  {product.currentStock}
+                </Text>{' '}
+                / {product.maxStock}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={[styles.text, styles.col]}>Precio:</Text>
+              <Text style={[styles.text, styles.colAuto]}>
+                $ {product.precio.toFixed(2)}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.toggleButton}
+              onPress={() => setShowStockOptions(!showStockOptions)}
+            >
+              <Text style={styles.toggleButtonText}>
+                {showStockOptions ? 'Ocultar Opciones de Stock' : 'Mostrar Opciones de Stock'}
+              </Text>
+            </TouchableOpacity>
+            {showStockOptions && (
+              <>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Entradas"
+                    placeholderTextColor="#828894"
+                    keyboardType="numeric"
+                    value={entrada}
+                    onChangeText={setEntrada}
+                  />
+                  <TouchableOpacity style={styles.button} onPress={() => updateStock('entrada')}>
+                    <Text style={styles.buttonText}>Actualizar Entrada</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Salidas"
+                    placeholderTextColor="#828894"
+                    keyboardType="numeric"
+                    value={salida}
+                    onChangeText={setSalida}
+                  />
+                  <TouchableOpacity style={styles.button} onPress={() => updateStock('salida')}>
+                    <Text style={styles.buttonText}>Actualizar Salida</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Stock Mínimo"
+                    placeholderTextColor="#828894"
+                    keyboardType="numeric"
+                    value={minStock}
+                    onChangeText={setMinStock}
+                  />
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Stock Máximo"
+                    placeholderTextColor="#828894"
+                    keyboardType="numeric"
+                    value={maxStock}
+                    onChangeText={setMaxStock}
+                  />
+                  <TouchableOpacity style={styles.button} onPress={updateMinMaxStock}>
+                    <Text style={styles.buttonText}>Actualizar Stock Mín/Máx</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
-          <View style={styles.row}>
-            <Text style={[styles.text, styles.col]}>Precio:</Text>
-            <Text style={[styles.text, styles.colAuto]}>
-              $ {product.precio.toFixed(2)}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.toggleButton}
-            onPress={() => setShowStockOptions(!showStockOptions)}
-          >
-            <Text style={styles.toggleButtonText}>
-              {showStockOptions ? 'Ocultar Opciones de Stock' : 'Mostrar Opciones de Stock'}
-            </Text>
-          </TouchableOpacity>
-          {showStockOptions && (
-            <>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Entradas"
-                  placeholderTextColor="#828894"
-                  keyboardType="numeric"
-                  value={entrada}
-                  onChangeText={setEntrada}
-                />
-                <TouchableOpacity style={styles.button} onPress={() => updateStock('entrada')}>
-                  <Text style={styles.buttonText}>Actualizar Entrada</Text>
-                </TouchableOpacity>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Salidas"
-                  placeholderTextColor="#828894"
-                  keyboardType="numeric"
-                  value={salida}
-                  onChangeText={setSalida}
-                />
-                <TouchableOpacity style={styles.button} onPress={() => updateStock('salida')}>
-                  <Text style={styles.buttonText}>Actualizar Salida</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Stock Mínimo"
-                  placeholderTextColor="#828894"
-                  keyboardType="numeric"
-                  value={minStock}
-                  onChangeText={setMinStock}
-                />
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Stock Máximo"
-                  placeholderTextColor="#828894"
-                  keyboardType="numeric"
-                  value={maxStock}
-                  onChangeText={setMaxStock}
-                />
-                <TouchableOpacity style={styles.button} onPress={updateMinMaxStock}>
-                  <Text style={styles.buttonText}>Actualizar Stock Mín/Máx</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-          <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('ProductAdd')}>
-            <Text style={styles.addButtonText}>Añadir más productos</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+        )}
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('ProductAdd')}>
+          <Text style={styles.addButtonText}>Añadir más productos</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -199,6 +201,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1E1F28',
     padding: 16,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   container: {
     backgroundColor: '#2A2C36',
