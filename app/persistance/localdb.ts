@@ -1,9 +1,13 @@
 import SQLite from 'react-native-sqlite-storage';
 
+SQLite.DEBUG(true);
+SQLite.enablePromise(true);
+
 export default class LocalDB {
   static async connect() {
     return SQLite.openDatabase({name: 'inventario'});
   }
+
   static async init() {
     const db = await LocalDB.connect();
     db.transaction(tx => {
@@ -17,8 +21,12 @@ export default class LocalDB {
           maxStock      INTEGER       NOT NULL      DEFAULT 0
         );`,
         [],
-        () => {},
-        error => console.error({error}),
+        () => {
+          console.log('Tabla productos creada exitosamente');
+        },
+        error => {
+          console.error('Error al crear la tabla productos:', error);
+        },
       );
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS movimientos (
@@ -28,8 +36,12 @@ export default class LocalDB {
           cantidad      INTEGER     NOT NULL
         );`,
         [],
-        () => {},
-        error => console.error({error}),
+        () => {
+          console.log('Tabla movimientos creada exitosamente');
+        },
+        error => {
+          console.error('Error al crear la tabla movimientos:', error);
+        },
       );
     });
   }

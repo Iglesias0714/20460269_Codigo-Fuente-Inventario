@@ -1,11 +1,11 @@
-import React from 'react';
-import {Button} from 'react-native';
+import React, { useEffect } from 'react';
+import { Button } from 'react-native';
 import {
   NavigationContainer,
   NavigationProp,
   useNavigation,
 } from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import Home from './app/screens/Home';
 import Login from './app/screens/Login';
@@ -18,6 +18,7 @@ import {
   MovimientosScreenParams,
   SalidasScreen,
 } from './app/screens/MovimientosScreens';
+import LocalDB from './app/persistance/localdb';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -39,6 +40,10 @@ function HomeHeader(): React.JSX.Element {
 }
 
 function App(): React.JSX.Element {
+  useEffect(() => {
+    LocalDB.init();
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
@@ -47,7 +52,7 @@ function App(): React.JSX.Element {
           component={Login}
           options={{
             headerShown: false,
-            headerStyle: {backgroundColor: '#ff0040'},
+            headerStyle: { backgroundColor: '#ff0040' },
           }}
         />
         <Stack.Screen

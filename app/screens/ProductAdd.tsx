@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import LocalDB from '../persistance/localdb';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation, CommonActions } from '@react-navigation/native';
 import { RootStackParamList } from '../../App';
-import WebServiceParams from '../WebServiceParams';
 
 export default function ProductAdd(): React.JSX.Element {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -22,28 +21,38 @@ export default function ProductAdd(): React.JSX.Element {
       db.transaction(tx => {
         tx.executeSql(
           'INSERT INTO productos (nombre, precio, minStock) VALUES (?, ?, ?)',
-          [nombre, precio, minStock],
-        );
-        navigation.goBack();
-      });
-
-      const response = await fetch(
-        `http://${WebServiceParams.host}:${WebServiceParams.port}/productos`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+          [nombre, parseFloat(precio), parseInt(minStock)],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              tx.executeSql(
+                'SELECT * FROM productos WHERE id = ?',
+                [results.insertId],
+                (tx, results) => {
+                  if (results.rows.length > 0) {
+                    const newProduct = results.rows.item(0);
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 1,
+                        routes: [
+                          { name: 'Home' },
+                          { name: 'ProductDetails', params: { product: newProduct } },
+                        ],
+                      })
+                    );
+                  }
+                }
+              );
+            }
           },
-          body: JSON.stringify({ nombre, precio, minStock }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+          (tx, error) => {
+            console.error(error);
+            Alert.alert('Error', 'No se pudo guardar el producto');
+          }
+        );
+      });
     } catch (error) {
-      Alert.alert('Error', 'No se pudo guardar el producto. Verifique su conexión a internet y el servidor.');
       console.error(error);
+      Alert.alert('Error', 'No se pudo conectar a la base de datos');
     }
   };
 

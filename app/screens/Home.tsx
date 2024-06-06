@@ -39,7 +39,6 @@ function Home({ navigation }: HomeProps): React.JSX.Element {
       </View>
     </TouchableOpacity>
   );
-
   useEffect(() => {
     LocalDB.init();
     navigation.addListener('focus', async () => {
