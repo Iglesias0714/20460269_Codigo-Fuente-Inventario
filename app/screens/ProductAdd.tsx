@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import LocalDB from '../persistance/localdb';
-import { NavigationProp, useNavigation, CommonActions } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../App';
 
 export default function ProductAdd(): React.JSX.Element {
@@ -30,15 +30,7 @@ export default function ProductAdd(): React.JSX.Element {
                 (tx, results) => {
                   if (results.rows.length > 0) {
                     const newProduct = results.rows.item(0);
-                    navigation.dispatch(
-                      CommonActions.reset({
-                        index: 1,
-                        routes: [
-                          { name: 'Home' },
-                          { name: 'ProductDetails', params: { product: newProduct } },
-                        ],
-                      })
-                    );
+                    navigation.navigate('ProductDetails', { product: newProduct });
                   }
                 }
               );
